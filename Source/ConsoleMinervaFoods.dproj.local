@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>2023/11/07 13:59:47.000.361,=C:\Users\Gustavo Cruz\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
+    <Transaction>2023/11/07 14:00:38.000.377,=C:\Users\Gustavo Cruz\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
+    <Transaction>2024/09/23 11:11:03.000.646,=C:\Users\Gustavo Cruz\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
+    <Transaction>2024/09/23 11:18:52.000.347,C:\MinervaFoods\Source\Main.pas=C:\Users\Gustavo Cruz\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
+    <Transaction>2024/09/23 11:18:52.000.347,C:\MinervaFoods\Source\Main.dfm=C:\Users\Gustavo Cruz\Documents\Embarcadero\Studio\Projects\Unit1.dfm</Transaction>
+    <Transaction>2024/09/23 11:19:09.000.260,C:\MinervaFoods\Source\ConsoleMinervaFoods.dproj=C:\Users\Gustavo Cruz\Documents\Embarcadero\Studio\Projects\Project1.dproj</Transaction>
+    <Transaction>2024/09/23 11:19:40.000.255,=C:\MinervaFoods\Source\Unit1.pas</Transaction>
+    <Transaction>2024/09/23 11:30:00.000.923,C:\MinervaFoods\Source\Util\Base.pas=C:\MinervaFoods\Source\Unit1.pas</Transaction>
+    <Transaction>2024/09/23 11:30:00.000.923,C:\MinervaFoods\Source\Util\Base.dfm=C:\MinervaFoods\Source\Unit1.dfm</Transaction>
+    <Transaction>2024/09/23 11:30:08.000.236,C:\MinervaFoods\Source\Unit1.pas=C:\MinervaFoods\Source\Util\Base.pas</Transaction>
+    <Transaction>2024/09/23 11:30:08.000.236,C:\MinervaFoods\Source\Unit1.dfm=C:\MinervaFoods\Source\Util\Base.dfm</Transaction>
+    <Transaction>2024/09/23 11:30:45.000.810,=C:\MinervaFoods\Source\Unit2.pas</Transaction>
+    <Transaction>2024/09/23 11:32:41.000.887,C:\MinervaFoods\Source\Util\DMBase.dfm=C:\MinervaFoods\Source\Unit2.dfm</Transaction>
+    <Transaction>2024/09/23 11:32:41.000.887,C:\MinervaFoods\Source\Util\DMBase.pas=C:\MinervaFoods\Source\Unit2.pas</Transaction>
+    <Transaction>2024/09/23 11:37:31.000.673,C:\MinervaFoods\Source\Util\Base.pas=C:\MinervaFoods\Source\Unit1.pas</Transaction>
+    <Transaction>2024/09/23 11:37:31.000.673,C:\MinervaFoods\Source\Util\Base.dfm=C:\MinervaFoods\Source\Unit1.dfm</Transaction>
+    <Transaction>2024/09/23 13:02:14.000.559,=C:\MinervaFoods\Source\Unit1.pas</Transaction>
+    <Transaction>2024/09/23 13:02:22.000.303,=C:\MinervaFoods\Source\Unit2.pas</Transaction>
+    <Transaction>2024/09/23 13:02:28.000.252,=C:\MinervaFoods\Source\Unit3.pas</Transaction>
+    <Transaction>2024/09/23 13:03:00.000.821,C:\MinervaFoods\Source\Clients.dfm=C:\MinervaFoods\Source\Unit1.dfm</Transaction>
+    <Transaction>2024/09/23 13:03:00.000.821,C:\MinervaFoods\Source\Clients.pas=C:\MinervaFoods\Source\Unit1.pas</Transaction>
+    <Transaction>2024/09/23 13:03:53.000.166,C:\MinervaFoods\Source\Products.dfm=C:\MinervaFoods\Source\Unit2.dfm</Transaction>
+    <Transaction>2024/09/23 13:03:53.000.166,C:\MinervaFoods\Source\Products.pas=C:\MinervaFoods\Source\Unit2.pas</Transaction>
+    <Transaction>2024/09/23 13:04:30.000.743,C:\MinervaFoods\Source\Orders.dfm=C:\MinervaFoods\Source\Unit3.dfm</Transaction>
+    <Transaction>2024/09/23 13:04:30.000.743,C:\MinervaFoods\Source\Orders.pas=C:\MinervaFoods\Source\Unit3.pas</Transaction>
+    <Transaction>2024/09/23 15:57:12.000.394,=C:\MinervaFoods\Source\Unit1.pas</Transaction>
+    <Transaction>2024/09/23 16:04:04.000.507,C:\MinervaFoods\Source\Util\Functions.pas=C:\MinervaFoods\Source\Unit1.pas</Transaction>
+  </Transactions>
+</BorlandProject>

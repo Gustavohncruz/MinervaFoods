@@ -1,0 +1,81 @@
+unit Functions;
+
+interface
+
+uses Winapi.Windows, Vcl.Forms,System.SysUtils,System.RegularExpressions;
+
+function IsValidCelular(CelNumber: string): boolean;
+function IsValidEmail(Email: String): Boolean;
+
+type
+  TCalculatePriceOrder = class
+    strict private
+    FIdOrder: Integer;
+    FAmount: Integer;
+    FPrice: Double;
+    function GetPrice: Double;
+    procedure SetAmount(const Value: Integer);
+    procedure SetPrice(const Value: Double);
+  public
+    constructor Create(const pIdOrder : Integer);
+
+    property IdOrder: Integer read FIdOrder;
+    property Amount: Integer read FAmount write SetAmount;
+    property Price: Double read FPrice write SetPrice;
+    property Total: Double read GetPrice;
+  end;
+
+implementation
+
+function IsValidCelular(CelNumber: string): boolean;
+var
+  ipRegExp : string;
+begin
+  Result := False;
+
+  try
+    ipRegExp := '^[1-9]{2}(?:[6-9]|9[1-9])[0-9]{3}[0-9]{4}$';
+
+    if TRegEx.IsMatch(CelNumber, ipRegExp) then
+      Result := True;
+  except
+    on e: Exception do
+    begin
+      Application.MessageBox(PChar('Ocorreu o seguinte erro:'+e.Message), 'Erro', MB_OK + MB_OK);
+    end;
+  end;
+end;
+
+function IsValidEmail(Email: String): Boolean;
+begin
+  if (Pos('@', Email) < 1) or
+   (Pos('.',Copy(Email,Pos('@',Email)+1,Length(Email)-Pos('@',Email))) < 1)
+   or (Copy(Email,0,Pos('@',Email)-1)='') then
+    Result := False
+  else
+    Result := True;
+end;
+
+{ TCalculatePriceOrder }
+
+constructor TCalculatePriceOrder.Create(const pIdOrder: Integer);
+begin
+
+end;
+
+function TCalculatePriceOrder.GetPrice: Double;
+begin
+  Result := (FAmount * FPrice);
+end;
+
+procedure TCalculatePriceOrder.SetAmount(const Value: Integer);
+begin
+  FAmount := Value;
+end;
+
+procedure TCalculatePriceOrder.SetPrice(const Value: Double);
+begin
+  FPrice := Value;
+end;
+
+end.

@@ -1,0 +1,291 @@
+unit Base;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Data.DB, Vcl.Grids, Vcl.DBGrids,
+  Vcl.StdCtrls, Vcl.Buttons, Vcl.ExtCtrls, Vcl.ComCtrls, FireDAC.Comp.Client,
+  FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Param,
+  FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf, FireDAC.DApt.Intf,
+  FireDAC.Stan.Async, FireDAC.DApt, FireDAC.Comp.DataSet;
+
+type
+  TfrmBase = class(TForm)
+    pcBase: TPageControl;
+    tsShearch: TTabSheet;
+    tsDetails: TTabSheet;
+    pnlTop: TPanel;
+    btnInsert: TButton;
+    btnSave: TButton;
+    btnDelete: TButton;
+    Panel4: TPanel;
+    btnSearch: TSpeedButton;
+    edSearch: TEdit;
+    dbgSearch: TDBGrid;
+    dsSearch: TDataSource;
+    fdqSearch: TFDQuery;
+    dsMain: TDataSource;
+    fdqMain: TFDQuery;
+    fdqSearchIDCLIENT: TFDAutoIncField;
+    fdqSearchNAMECLIENT: TStringField;
+    fdqSearchTELEPHONE: TStringField;
+    fdqSearchEMAIL: TStringField;
+    fdqSearchADDRESSCLIENT: TStringField;
+    procedure dbgSearchDrawColumnCell(Sender: TObject; const Rect: TRect;
+      DataCol: Integer; Column: TColumn; State: TGridDrawState);
+    procedure dbgSearchTitleClick(Column: TColumn);
+    procedure dbgSearchDblClick(Sender: TObject);
+    procedure pcBaseChange(Sender: TObject);
+    procedure dsMainStateChange(Sender: TObject);
+    procedure FormShow(Sender: TObject);
+    procedure btnDeleteClick(Sender: TObject);
+    procedure btnSearchClick(Sender: TObject);
+    procedure btnSaveClick(Sender: TObject);
+    procedure btnInsertClick(Sender: TObject);
+    procedure edSearchKeyPress(Sender: TObject; var Key: Char);
+  private
+    { Private declarations }
+    procedure UpdateStateBtn;
+    procedure Filter( Where,Filter : String );
+  public
+    { Public declarations }
+  end;
+
+var
+  frmBase: TfrmBase;
+  _WhereFilter: string;
+  _SQLMain: string;
+  _SQLSearch: string;
+  _PrimaryKey: string;
+
+implementation
+
+uses DMBase;
+
+{$R *.dfm}
+
+procedure TfrmBase.btnSaveClick(Sender: TObject);
+var Error: Integer;
+cMsgError: string;
+begin
+  Error := 0;
+  cMsgError := '';
+
+  try
+    try
+      if fdqMain.State in[dsEdit,dsInsert] then
+        fdqMain.Post;
+
+      Screen.Cursor := crHourGlass;
+
+      DM.FDConnection.StartTransaction;
+
+      Error := fdqMain.ApplyUpdates;
+
+      if Error > 0 then
+        raise Exception.Create('Erro ao salvar.');
+
+      fdqMain.CommitUpdates;
+
+      pcBase.ActivePage := tsShearch;
+      pcBaseChange(Sender);
+      btnSearchClick(Sender);
+    except
+      on e: Exception do
+      begin
+        DM.FDConnection.Rollback;
+        cMsgError := e.Message;
+      end;
+    end;
+  finally
+    Screen.Cursor := crDefault;
+
+    if Error = 0 then
+    begin
+      DM.FDConnection.Commit;
+      Application.MessageBox(PChar('Registro salvo com sucesso'), 'Sucesso', MB_OK + MB_OK);
+    end
+    else
+      Application.MessageBox(PChar(cMsgError), 'Aviso', MB_OK + MB_OK);
+  end;
+end;
+
+procedure TfrmBase.btnDeleteClick(Sender: TObject);
+var Error: Integer;
+begin
+  if Application.MessageBox(PChar('Deseja realmente excluir o cadastro ?'), 'Pergunta', MB_YESNO +
+      MB_ICONQUESTION + MB_DEFBUTTON1) = IDNO then
+    Exit;
+
+  try
+    pcBase.ActivePage := tsShearch;
+    pcBaseChange(Sender);
+
+    fdqMain.Delete;
+    Error := fdqMain.ApplyUpdates;
+
+    if Error > 0 then
+      raise Exception.Create('Erro ao excluir.');
+
+    fdqMain.CommitUpdates;
+
+    btnSearchClick(Sender);
+
+    Application.MessageBox(PChar('Registro salvo com sucesso'), 'Sucesso', MB_OK + MB_OK);
+  except
+    on e: Exception do
+    begin
+      Application.MessageBox(PChar('Ocorreu o seguinte erro:'+e.Message), 'Erro', MB_OK + MB_OK);
+    end;
+  end;
+end;
+
+procedure TfrmBase.btnInsertClick(Sender: TObject);
+begin
+  fdqMain.Insert;
+
+  pcBase.ActivePage := tsDetails;
+  pcBaseChange(Sender);
+end;
+
+procedure TfrmBase.btnSearchClick(Sender: TObject);
+begin
+  Filter(_WhereFilter,edSearch.Text);
+end;
+
+procedure TfrmBase.dbgSearchDblClick(Sender: TObject);
+begin
+  if fdqSearch.IsEmpty then
+    Exit;
+
+  pcBase.ActivePage := tsDetails;
+  pcBaseChange(Sender);
+end;
+
+procedure TfrmBase.dbgSearchDrawColumnCell(Sender: TObject; const Rect: TRect;
+  DataCol: Integer; Column: TColumn; State: TGridDrawState);
+begin
+  if not odd(TDbgrid(Sender).DataSource.DataSet.RecNo) then
+    if not (gdSelected in State) then
+    begin
+      TDbgrid(Sender).Canvas.Brush.Color := clMoneyGreen;
+      TDbgrid(Sender).Canvas.FillRect(Rect);
+      TDbgrid(Sender).DefaultDrawDataCell(rect,Column.Field,state);
+    end;
+end;
+
+procedure TfrmBase.dbgSearchTitleClick(Column: TColumn);
+var
+  vlbMesmoCampo: Boolean;
+  vloIndices: TStrings;
+  vliCont: Integer;
+begin
+  inherited;
+  vlbMesmoCampo := False;
+  vloIndices := TStringList.Create;
+  TFDQuery(Column.Grid.DataSource.DataSet).GetIndexNames(vloIndices);
+  TFDQuery(Column.Grid.DataSource.DataSet).IndexName := EmptyStr;
+  vliCont := vloIndices.IndexOf('idx' + Column.FieldName);
+
+  if vliCont >= 0 then
+  begin
+    vlbMesmoCampo := not (ixDescending in TFDQuery(Column.Grid.DataSource.DataSet).IndexDefs[vliCont].Options);
+    TFDQuery(Column.Grid.DataSource.DataSet).DeleteIndex('idx' + Column.FieldName);
+  end;
+
+  if vlbMesmoCampo then
+    TFDQuery(Column.Grid.DataSource.DataSet).AddIndex('idx' + Column.FieldName, Column.FieldName,  Column.FieldName,[])
+  else
+    TFDQuery(Column.Grid.DataSource.DataSet).AddIndex('idx' + Column.FieldName, Column.FieldName, '', []);
+
+  TFDQuery(Column.Grid.DataSource.DataSet).IndexName := 'idx' + Column.FieldName;
+end;
+
+procedure TfrmBase.dsMainStateChange(Sender: TObject);
+begin
+  UpdateStateBtn;
+end;
+
+procedure TfrmBase.edSearchKeyPress(Sender: TObject; var Key: Char);
+begin
+  if Key = #13 then
+    Filter(_WhereFilter,edSearch.Text);
+end;
+
+procedure TfrmBase.Filter(Where,Filter: String);
+var  SQL: string;
+begin
+  try
+    Screen.Cursor := crHourGlass;
+
+    if Trim( Filter ) <> '' then
+    begin
+      Where := Format( Where,
+                        [
+                          sttointdef( Filter,0) ,
+                          Filter ,
+                          Filter ,
+                          Filter
+                        ] );
+
+      Where := ' WHERE '+ Where;
+    end
+    else
+      Where := '';
+
+    SQL := Format( _SQLSearch,[ Where ] );
+
+    fdqSearch.DisableControls;
+    fdqSearch.Close;
+    fdqSearch.SQL.Text := SQL;
+    fdqSearch.Open;
+
+    tsDetails.TabVisible := not fdqSearch.IsEmpty;
+  finally
+    fdqSearch.First;
+    fdqSearch.EnableControls;
+    Screen.Cursor := crDefault;
+  end;
+end;
+
+procedure TfrmBase.FormShow(Sender: TObject);
+begin
+  fdqSearch.SQL.Text := _SQLSearch;
+  fdqMain.SQL.Text := _SQLMain;
+
+  fdqMain.Close;
+  fdqMain.Params.ParamByName(_PrimaryKey).AsInteger := -1;
+  fdqMain.Open;
+
+  pcBase.ActivePage := tsShearch;
+  Filter(_WhereFilter,edSearch.Text);
+  UpdateStateBtn;
+end;
+
+procedure TfrmBase.pcBaseChange(Sender: TObject);
+var ID: Integer;
+begin
+  if (dsMain.State in[dsInsert]) then
+    ID := -1
+  else
+    ID := fdqSearch.FieldByName(_PrimaryKey).AsInteger;
+
+  fdqMain.Close;
+  fdqMain.Params.ParamByName(_PrimaryKey).AsInteger := ID;
+  fdqMain.Open;
+end;
+
+procedure TfrmBase.UpdateStateBtn;
+var lEdit,lInsert,lBrowser: Boolean;
+begin
+  lEdit := (dsMain.State in[dsEdit]);
+  lInsert := (dsMain.State in[dsInsert]);
+  lBrowser := (dsMain.State in[dsBrowse,dsInactive]);
+
+  btnInsert.Enabled := lBrowser;
+  btnSave.Enabled := (lEdit or lInsert);
+  btnDelete.Enabled := lBrowser;
+end;
+
+end.

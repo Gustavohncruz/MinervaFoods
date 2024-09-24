@@ -1,0 +1,24 @@
+program ConsoleMinervaFoods;
+
+uses
+  Vcl.Forms,
+  Main in 'Main.pas' {frmMain},
+  Base in 'Util\Base.pas' {frmBase},
+  DMBase in 'Util\DMBase.pas' {DM: TDataModule},
+  Clients in 'Clients.pas' {frmClient},
+  Products in 'Products.pas' {frmProducts},
+  Orders in 'Orders.pas' {frmOrders};
+
+{$R *.res}
+
+begin
+  Application.Initialize;
+  Application.MainFormOnTaskbar := True;
+  Application.CreateForm(TfrmMain, frmMain);
+  Application.CreateForm(TfrmBase, frmBase);
+  Application.CreateForm(TDM, DM);
+  Application.CreateForm(TfrmClient, frmClient);
+  Application.CreateForm(TfrmProducts, frmProducts);
+  Application.CreateForm(TfrmOrders, frmOrders);
+  Application.Run;
+end.

@@ -1,0 +1,26 @@
+object DM: TDM
+  OldCreateOrder = False
+  Height = 273
+  Width = 336
+  object FDConnection: TFDConnection
+    Params.Strings = (
+      'Server=ml-co-dev.catu4ydxfjgu.us-east-1.rds.amazonaws.com'
+      'User_Name=admin'
+      'Password=cQbrgCtuYc7WTrxjjZa3sU8YkbCTHLa7UEazD32QJ4w'
+      'ApplicationName=Enterprise/Architect/Ultimate'
+      'Workstation=MB-ENGSW-019501'
+      'Database=modulocker_condominios'
+      'MARS=yes'
+      'DriverID=MSSQL')
+    FetchOptions.AssignedValues = [evMode, evRowsetSize]
+    FetchOptions.Mode = fmAll
+    FetchOptions.RowsetSize = -1
+    ResourceOptions.AssignedValues = [rvCmdExecMode, rvAutoReconnect]
+    ResourceOptions.AutoReconnect = True
+    UpdateOptions.AssignedValues = [uvRefreshMode, uvAutoCommitUpdates]
+    TxOptions.AutoStop = False
+    LoginPrompt = False
+    Left = 48
+    Top = 40
+  end
+end

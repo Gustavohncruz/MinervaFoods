@@ -1,0 +1,52 @@
+unit uTestCalculatePriceOrder;
+
+interface
+
+uses DUnitX.TestFramework, Functions;
+
+type
+  [TestFixture]
+  TTestCalculatePriceOrder = class
+  strict private
+    FCalculatePriceOrder: TCalculatePriceOrder;
+  public
+    [Setup]
+    procedure Setup;
+
+    [Teardown]
+    procedure Teardown;
+
+    [Test]
+    [TestCase('Base','5,100,500')]
+    [TestCase('Decimal','5,100.50,502.50')]
+    procedure CalculatePriceOrder(const Amount: Integer; const PriceIn, PriceOut:Double );
+  end;
+
+implementation
+
+{ TTestCalculatePriceOrder }
+
+procedure TTestCalculatePriceOrder.CalculatePriceOrder(const Amount: Integer; const PriceIn, PriceOut:Double );
+var Result: Double;
+begin
+  FCalculatePriceOrder.Amount := Amount;
+  FCalculatePriceOrder.Price := PriceIn;
+
+  Result := FCalculatePriceOrder.Total;
+
+  Assert.AreEqual<Double>(PriceOut,Result,'Value Price' );
+end;
+
+procedure TTestCalculatePriceOrder.Setup;
+begin
+  FCalculatePriceOrder := TCalculatePriceOrder.Create(1);
+end;
+
+procedure TTestCalculatePriceOrder.Teardown;
+begin
+  FCalculatePriceOrder.Free;
+end;
+
+initialization
+  TDUnitX.RegisterTestFixture(TTestCalculatePriceOrder);
+end.

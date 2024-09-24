@@ -1,0 +1,336 @@
+unit Orders;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Base, Data.DB, FireDAC.Stan.Intf,
+  FireDAC.Stan.Option, FireDAC.Stan.Param, FireDAC.Stan.Error, FireDAC.DatS,
+  FireDAC.Phys.Intf, FireDAC.DApt.Intf, FireDAC.Stan.Async, FireDAC.DApt,
+  FireDAC.Comp.DataSet, FireDAC.Comp.Client, Vcl.StdCtrls, Vcl.Grids,
+  Vcl.DBGrids, Vcl.Buttons, Vcl.ExtCtrls, Vcl.ComCtrls, Vcl.Mask, Vcl.DBCtrls,
+  frxSmartMemo, frxClass, frxDBSet, frCoreClasses;
+
+type
+  TfrmOrders = class(TfrmBase)
+    fdqMainIDORDER: TFDAutoIncField;
+    fdqMainIDCLIENT: TIntegerField;
+    fdqMainDTORDER: TSQLTimeStampField;
+    fdqMainTOTALPRICE: TFloatField;
+    fdqClient: TFDQuery;
+    dsClient: TDataSource;
+    fdqClientIDCLIENT: TFDAutoIncField;
+    fdqClientNAMECLIENT: TStringField;
+    fdqClientTELEPHONE: TStringField;
+    fdqClientEMAIL: TStringField;
+    fdqClientADDRESSCLIENT: TStringField;
+    Label1: TLabel;
+    DBEdit1: TDBEdit;
+    Label2: TLabel;
+    Label3: TLabel;
+    DBEdit3: TDBEdit;
+    dtOrder: TDateTimePicker;
+    Label4: TLabel;
+    fdqSearchIDORDER: TFDAutoIncField;
+    fdqSearchTOTALPRICE: TFloatField;
+    fdqSearchNAMECLIENT: TStringField;
+    pcOrdersItems: TPageControl;
+    tsOrdersItems: TTabSheet;
+    dsOrdersItems: TDataSource;
+    fdqOrdersItems: TFDQuery;
+    fdqOrdersItemsIDORDER_ITEM: TFDAutoIncField;
+    fdqOrdersItemsIDORDER: TIntegerField;
+    fdqOrdersItemsIDPRODUCT: TIntegerField;
+    fdqOrdersItemsAMOUNT: TIntegerField;
+    fdqOrdersItemsPRICE: TFloatField;
+    Label5: TLabel;
+    DBEdit2: TDBEdit;
+    Label6: TLabel;
+    DBEdit4: TDBEdit;
+    Label7: TLabel;
+    DBEdit5: TDBEdit;
+    dsProduct: TDataSource;
+    fdqProduct: TFDQuery;
+    fdqProductIDPRODUCT: TFDAutoIncField;
+    fdqProductNAMEPRODUCT: TStringField;
+    fdqProductDESCRIPTIONPRODUCT: TStringField;
+    fdqProductPRICE: TFloatField;
+    Label8: TLabel;
+    DBNavigator1: TDBNavigator;
+    DBLookupComboBox3: TDBLookupComboBox;
+    DBLookupComboBox2: TDBLookupComboBox;
+    Button1: TButton;
+    frxReport: TfrxReport;
+    frxReportOrders: TfrxDBDataset;
+    dsReportOrders: TDataSource;
+    fdpReportOrders: TFDQuery;
+    fdqReportOrdersItems: TFDQuery;
+    dsReportOrdersItems: TDataSource;
+    fdpReportOrdersIDORDER: TFDAutoIncField;
+    fdpReportOrdersIDCLIENT: TIntegerField;
+    fdpReportOrdersDTORDER: TSQLTimeStampField;
+    fdpReportOrdersTOTALPRICE: TFloatField;
+    fdpReportOrdersNAMECLIENT: TStringField;
+    fdpReportOrdersTELEPHONE: TStringField;
+    fdpReportOrdersADDRESSCLIENT: TStringField;
+    fdqReportOrdersItemsIDORDER_ITEM: TFDAutoIncField;
+    fdqReportOrdersItemsIDORDER: TIntegerField;
+    fdqReportOrdersItemsIDPRODUCT: TIntegerField;
+    fdqReportOrdersItemsAMOUNT: TIntegerField;
+    fdqReportOrdersItemsPRICE: TFloatField;
+    fdqReportOrdersItemsNAMEPRODUCT: TStringField;
+    fdqReportOrdersItemsDESCRIPTIONPRODUCT: TStringField;
+    frxReportOrdersItems: TfrxDBDataset;
+    DBGrid1: TDBGrid;
+    DBGrid2: TDBGrid;
+    procedure btnSearchClick(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+    procedure edSearchKeyPress(Sender: TObject; var Key: Char);
+    procedure DBEdit4KeyPress(Sender: TObject; var Key: Char);
+    procedure DBEdit5KeyPress(Sender: TObject; var Key: Char);
+    procedure fdqMainAfterApplyUpdates(DataSet: TFDDataSet; AErrors: Integer);
+    procedure fdqMainAfterOpen(DataSet: TDataSet);
+    procedure dtOrderChange(Sender: TObject);
+    procedure dsOrdersItemsStateChange(Sender: TObject);
+    procedure fdqOrdersItemsAfterInsert(DataSet: TDataSet);
+    procedure fdqOrdersItemsIDPRODUCTChange(Sender: TField);
+    procedure fdqOrdersItemsBeforeScroll(DataSet: TDataSet);
+    procedure fdqMainAfterDelete(DataSet: TDataSet);
+    procedure Button1Click(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  frmOrders: TfrmOrders;
+
+implementation
+
+{$R *.dfm}
+
+procedure TfrmOrders.btnSearchClick(Sender: TObject);
+begin
+  _WhereFilter :=
+    '     (IDORDER = %d ) OR '+
+    '     (NAMECLIENT LIKE %s ) ';
+
+  _WhereFilter := Format( _WhereFilter,
+                        [ StrToIntDef( edSearch.Text ,0),
+                          QuotedStr( '%' + edSearch.Text + '%' )
+                        ] );
+  inherited;
+
+end;
+
+procedure TfrmOrders.Button1Click(Sender: TObject);
+var  SQL, Where: string;
+begin
+  inherited;
+  _WhereFilter :=
+    '     (IDORDER = %d ) OR '+
+    '     (NAMECLIENT LIKE %s ) ';
+
+  _WhereFilter := Format( _WhereFilter,
+                        [ StrToIntDef( edSearch.Text ,0),
+                          QuotedStr( '%' + edSearch.Text + '%' )
+                        ] );
+
+  if Trim( edSearch.Text ) <> '' then
+    Where := ' WHERE '+ _WhereFilter
+  else
+    Where := '';
+
+  SQL :=
+    ' SELECT O.IDORDER, O.IDCLIENT, O.DTORDER, O.TOTALPRICE, C.NAMECLIENT, C.TELEPHONE, ADDRESSCLIENT '+
+    ' FROM MFORDERS O '+
+    ' JOIN MFCLIENT C ON O.IDCLIENT = C.IDCLIENT '+
+    ' %s ';
+
+  SQL := Format( SQL,[ Where ] );
+
+  fdpReportOrders.Close;
+  fdpReportOrders.SQL.Text := SQL;
+  fdpReportOrders.Open;
+
+  fdqReportOrdersItems.Close;
+  fdqReportOrdersItems.Open;
+
+  frxReport.Clear;
+  frxReport.LoadFromFile(ExtractFilePath(Application.ExeName) + '\Report\Orders.fr3');
+  frxReport.PrepareReport(True);
+  frxReport.ShowPreparedReport;
+end;
+
+procedure TfrmOrders.DBEdit4KeyPress(Sender: TObject; var Key: Char);
+begin
+  inherited;
+  if not (key in ['0'..'9',#8, #13]) then
+    key := #0;
+end;
+
+procedure TfrmOrders.DBEdit5KeyPress(Sender: TObject; var Key: Char);
+begin
+  inherited;
+  if not (key in ['0'..'9',#8, #13, ',']) then
+    key := #0;
+end;
+
+procedure TfrmOrders.dsOrdersItemsStateChange(Sender: TObject);
+begin
+  inherited;
+  //Enabled Button Save
+  if (fdqOrdersItems.State in[dsEdit,dsInsert]) then
+    if (fdqOrdersItems.State <> fdqMain.State) then
+      fdqMain.Edit;
+end;
+
+procedure TfrmOrders.dtOrderChange(Sender: TObject);
+begin
+  inherited;
+  if not (fdqMain.State in[dsEdit,dsInsert]) then
+    fdqMain.Edit;
+
+  fdqMainDTORDER.AsDateTime := dtOrder.Date;
+end;
+
+procedure TfrmOrders.edSearchKeyPress(Sender: TObject; var Key: Char);
+begin
+  inherited;
+//
+end;
+
+procedure TfrmOrders.fdqMainAfterApplyUpdates(DataSet: TFDDataSet;
+  AErrors: Integer);
+var Error: Integer;
+cMsgError: string;
+  MyClass: TComponent;
+begin
+  inherited;
+  Error := 0;
+  cMsgError := '';
+
+  try
+    Screen.Cursor := crHourGlass;
+    fdqOrdersItems.DisableControls;
+    try
+      fdqOrdersItems.First;
+      while not fdqOrdersItems.Eof do
+      begin
+        if fdqOrdersItemsIDORDER.AsInteger < 0 then
+        begin
+          fdqOrdersItems.Edit;
+          fdqOrdersItemsIDORDER.AsInteger := fdqMainIDORDER.AsInteger;
+          fdqOrdersItems.Post;
+        end;
+
+        fdqOrdersItems.Next;
+      end;
+    finally
+      fdqOrdersItems.EnableControls;
+    end;
+
+    try
+      Error := fdqOrdersItems.ApplyUpdates;
+
+      if Error > 0 then
+        raise Exception.Create('Erro ao salvar.');
+
+      fdqOrdersItems.CommitUpdates;
+    except
+      on e: Exception do
+      begin
+        cMsgError := e.Message;
+      end;
+    end;
+  finally
+    Screen.Cursor := crDefault;
+
+    if Error <> 0 then
+      Application.MessageBox(PChar(cMsgError), 'Aviso', MB_OK + MB_OK);
+  end;
+end;
+
+procedure TfrmOrders.fdqMainAfterDelete(DataSet: TDataSet);
+var Error: Integer;
+begin
+  inherited;
+  fdqOrdersItems.DisableControls;
+  try
+    fdqOrdersItems.First;
+    while not fdqOrdersItems.Eof do
+    begin
+      fdqOrdersItems.Delete;
+
+      fdqOrdersItems.Next;
+    end;
+  finally
+    fdqOrdersItems.EnableControls;
+  end;
+
+  try
+    Error := fdqOrdersItems.ApplyUpdates;
+
+    if Error > 0 then
+      raise Exception.Create('Erro ao excluir.');
+
+    fdqOrdersItems.CommitUpdates;
+  except
+    on e: Exception do
+    begin
+      Application.MessageBox(PChar('Ocorreu o seguinte erro:'+e.Message), 'Erro', MB_OK + MB_OK);
+    end;
+  end;
+end;
+
+procedure TfrmOrders.fdqMainAfterOpen(DataSet: TDataSet);
+begin
+  inherited;
+
+  if fdqMainDTORDER.AsDateTime = 0 then
+    dtOrder.Date := Now
+  else
+    dtOrder.Date := fdqMainDTORDER.AsDateTime;
+
+  fdqOrdersItems.Close;
+  fdqOrdersItems.Params.ParamByName('IDORDER').AsInteger := fdqMainIDORDER.AsInteger;
+  fdqOrdersItems.Open;
+end;
+
+procedure TfrmOrders.fdqOrdersItemsAfterInsert(DataSet: TDataSet);
+begin
+  inherited;
+  fdqOrdersItemsIDORDER.AsInteger := -1;
+end;
+
+procedure TfrmOrders.fdqOrdersItemsBeforeScroll(DataSet: TDataSet);
+begin
+  inherited;
+  if fdqOrdersItems.State in[dsEdit,dsInsert] then
+    fdqOrdersItems.Post;
+end;
+
+procedure TfrmOrders.fdqOrdersItemsIDPRODUCTChange(Sender: TField);
+begin
+  inherited;
+  fdqOrdersItemsPRICE.AsFloat := fdqProductPRICE.AsFloat;
+end;
+
+procedure TfrmOrders.FormCreate(Sender: TObject);
+begin
+  inherited;
+  _SQLMain := 'SELECT * FROM MFORDERS WHERE IDORDER = :IDORDER';
+  _SQLSearch :=
+    ' SELECT O.IDORDER, O.TOTALPRICE, C.NAMECLIENT '+
+    ' FROM MFORDERS O '+
+    ' JOIN MFCLIENT C ON O.IDCLIENT = C.IDCLIENT %s';
+  _PrimaryKey := 'IDORDER';
+
+  fdqClient.Close;
+  fdqClient.Open;
+  fdqProduct.Close;
+  fdqProduct.Open;
+end;
+
+end.
